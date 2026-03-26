@@ -33,6 +33,5 @@ app.post('/notes', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server kjører på http://localhost:3000);
+  console.log(`Server kjører på http://localhost:${3000}`);
 });
-
