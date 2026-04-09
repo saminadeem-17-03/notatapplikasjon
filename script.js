@@ -28,4 +28,4 @@ saveBtn.addEventListener('click', async () => {
 });
 
 // Last inn notater ved oppstart
-loadNotes();
+loadNotes();  
