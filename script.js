@@ -1,31 +1,46 @@
-const noteInput = document.getElementById('note');
-const saveBtn = document.getElementById('saveBtn');
-const notesList = document.getElementById('notesList');
-
 async function loadNotes() {
   const res = await fetch('/notes');
   const notes = await res.json();
-  notesList.innerHTML = '';
-  notes.forEach((note, i) => {
+
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+
+  notes.forEach(note => {
     const li = document.createElement('li');
-    li.textContent = note;
-    notesList.appendChild(li);
+
+    li.innerHTML = `
+      <span onclick="toggle(${note.id})" class="${note.done ? 'done' : ''}">
+        ${note.text}
+      </span>
+      <button onclick="deleteNote(${note.id})">❌</button>
+    `;
+
+    list.appendChild(li);
   });
 }
 
-saveBtn.addEventListener('click', async () => {
-  const note = noteInput.value.trim();
-  if (!note) return;
+async function addNote() {
+  const input = document.getElementById('input');
+  const text = input.value;
 
   await fetch('/notes', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ note })
+    body: JSON.stringify({ text })
   });
 
-  noteInput.value = '';
+  input.value = '';
   loadNotes();
-});
+}
 
-// Last inn notater ved oppstart
-loadNotes();  
+async function toggle(id) {
+  await fetch(`/notes/${id}`, { method: 'PUT' });
+  loadNotes();
+}
+
+async function deleteNote(id) {
+  await fetch(`/notes/${id}`, { method: 'DELETE' });
+  loadNotes();
+}
+
+loadNotes();

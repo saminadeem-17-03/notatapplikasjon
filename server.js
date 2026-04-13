@@ -1,37 +1,73 @@
 const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
-const path = require('path');
 
 const app = express();
 const PORT = 3000;
-const DATA_FILE = path.join(__dirname, 'data.json');
 
 app.use(express.json());
-app.use(express.static(__dirname)); // server html, css og js
+app.use(express.static(__dirname));
 
-// Hent alle notater
+// Database
+const db = new sqlite3.Database('./database.db');
+
+// Lag tabell
+db.run(`
+  CREATE TABLE IF NOT EXISTS notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    text TEXT,
+    done INTEGER
+  )
+`);
+
+// 🔄 Sync til JSON
+function backupToJSON() {
+  db.all("SELECT * FROM notes", [], (err, rows) => {
+    if (!err) {
+      fs.writeFileSync('backup.json', JSON.stringify(rows, null, 2));
+    }
+  });
+}
+
+// 📥 Hent notater
 app.get('/notes', (req, res) => {
-  let notes = [];
-  if (fs.existsSync(DATA_FILE)) {
-    notes = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
-  }
-  res.json(notes);
+  db.all("SELECT * FROM notes", [], (err, rows) => {
+    res.json(rows);
+  });
 });
 
-// Legg til nytt notat
+// ➕ Legg til
 app.post('/notes', (req, res) => {
-  const { note } = req.body;
-  if (!note) return res.status(400).send('Ingen note');
+  const { text } = req.body;
 
-  let notes = [];
-  if (fs.existsSync(DATA_FILE)) {
-    notes = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
-  }
-  notes.push(note);
-  fs.writeFileSync(DATA_FILE, JSON.stringify(notes, null, 2));
-  res.sendStatus(200);
+  db.run("INSERT INTO notes (text, done) VALUES (?, 0)", [text], function () {
+    backupToJSON();
+    res.sendStatus(200);
+  });
+});
+
+// ✔️ Toggle done
+app.put('/notes/:id', (req, res) => {
+  const id = req.params.id;
+
+  db.get("SELECT done FROM notes WHERE id=?", [id], (err, row) => {
+    const newValue = row.done ? 0 : 1;
+
+    db.run("UPDATE notes SET done=? WHERE id=?", [newValue, id], () => {
+      backupToJSON();
+      res.sendStatus(200);
+    });
+  });
+});
+
+// ❌ Slett
+app.delete('/notes/:id', (req, res) => {
+  db.run("DELETE FROM notes WHERE id=?", [req.params.id], () => {
+    backupToJSON();
+    res.sendStatus(200);
+  });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server kjører på http://localhost:${3000}`);
+  console.log(`Server kjører på http://localhost:${PORT}`);
 });

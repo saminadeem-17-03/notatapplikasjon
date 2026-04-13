@@ -2,18 +2,19 @@
 <html lang="no">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notatapplikasjon</title>
+  <title>Todo Notater</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Notatapplikasjon</h1>
 
-  <textarea id="note" placeholder="Skriv notatet ditt her..."></textarea>
-  <button id="saveBtn">Lagre notat</button>
+  <h1>📝 Todo Notater</h1>
 
-  <h2>Dine notater</h2>
-  <ul id="notesList"></ul>
+  <div class="container">
+    <input id="input" placeholder="Skriv et notat...">
+    <button onclick="addNote()">Legg til</button>
+  </div>
+
+  <ul id="list"></ul>
 
   <script src="script.js"></script>
 </body>
