@@ -2,20 +2,23 @@
 <html lang="no">
 <head>
   <meta charset="UTF-8">
-  <title>Todo Notater</title>
+  <title>Notater</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>📝 Todo Notater</h1>
+<h1>📝 Notater</h1>
 
-  <div class="container">
-    <input id="input" placeholder="Skriv et notat...">
-    <button onclick="addNote()">Legg til</button>
-  </div>
+<a href="todo.html">Gå til Todo →</a>
 
-  <ul id="list"></ul>
+<div class="box">
+  <input id="title" placeholder="Tittel">
+  <textarea id="content" placeholder="Skriv notat..."></textarea>
+  <button onclick="addNote()">Legg til</button>
+</div>
 
-  <script src="script.js"></script>
+<div id="notes"></div>
+
+<script src="script.js"></script>
 </body>
 </html>

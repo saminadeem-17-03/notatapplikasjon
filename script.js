@@ -2,44 +2,26 @@ async function loadNotes() {
   const res = await fetch('/notes');
   const notes = await res.json();
 
-  const list = document.getElementById('list');
-  list.innerHTML = '';
+  const container = document.getElementById('notes');
+  container.innerHTML = '';
 
-  notes.forEach(note => {
-    const li = document.createElement('li');
-
-    li.innerHTML = `
-      <span onclick="toggle(${note.id})" class="${note.done ? 'done' : ''}">
-        ${note.text}
-      </span>
-      <button onclick="deleteNote(${note.id})">❌</button>
-    `;
-
-    list.appendChild(li);
+  notes.forEach(n => {
+    const div = document.createElement('div');
+    div.innerHTML = `<h3>${n.title}</h3><p>${n.content}</p>`;
+    container.appendChild(div);
   });
 }
 
 async function addNote() {
-  const input = document.getElementById('input');
-  const text = input.value;
+  const title = document.getElementById('title').value;
+  const content = document.getElementById('content').value;
 
   await fetch('/notes', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text })
+    body: JSON.stringify({ title, content })
   });
 
-  input.value = '';
-  loadNotes();
-}
-
-async function toggle(id) {
-  await fetch(`/notes/${id}`, { method: 'PUT' });
-  loadNotes();
-}
-
-async function deleteNote(id) {
-  await fetch(`/notes/${id}`, { method: 'DELETE' });
   loadNotes();
 }
 
