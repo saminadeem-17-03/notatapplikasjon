@@ -1,21 +1,28 @@
 {
   "name": "notatapplikasjon",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Notatapplikasjon med API (server + klient)",
+  "main": "server.js",
   "scripts": {
-	"start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"No tests yet\""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/saminadeem-17-03/notatapplikasjon.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["notes", "api", "express", "todo"],
+  "author": "Sami Nadeem",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/saminadeem-17-03/notatapplikasjon/issues"
   },
-  "homepage": "https://github.com/saminadeem-17-03/notatapplikasjon#readme"
+  "homepage": "https://github.com/saminadeem-17-03/notatapplikasjon#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "fs-extra": "^11.1.1",
+    "uuid": "^9.0.0"
+  }
 }
