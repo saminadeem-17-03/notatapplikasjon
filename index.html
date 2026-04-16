@@ -1,84 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="no">
 <head>
-  <title>Notat App</title>
-  <style>
-    body { font-family: Arial; padding: 20px; }
-    input, textarea { display:block; margin:10px 0; }
-    .box { border:1px solid #ccc; padding:10px; margin:10px 0; }
-  </style>
+  <meta charset="UTF-8">
+  <title>Notater</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Notater</h1>
 
-  <input id="noteTitle" placeholder="Tittel">
-  <textarea id="noteContent" placeholder="Innhold"></textarea>
-  <button onclick="addNote()">Legg til notat</button>
+<h1>📝 Notater</h1>
 
-  <div id="notes"></div>
+<a href="todo.html">Gå til Todo →</a>
 
-  <h1>Todo</h1>
+<div class="box">
+  <input id="title" placeholder="Tittel">
+  <textarea id="content" placeholder="Skriv notat..."></textarea>
+  <button onclick="addNote()">Legg til</button>
+</div>
 
-  <input id="todoTitle" placeholder="Tittel">
-  <input id="taskText" placeholder="Oppgave">
-  <button onclick="addTodo()">Legg til todo</button>
+<div id="notes"></div>
 
-  <div id="todos"></div>
-
-<script>
-
-const API = "http://localhost:3000";
-const KEY = "12345";
-
-async function addNote() {
-  await fetch(API + "/notes", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": KEY
-    },
-    body: JSON.stringify({
-      title: noteTitle.value,
-      content: noteContent.value
-    })
-  });
-  load();
-}
-
-async function addTodo() {
-  await fetch(API + "/todos", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": KEY
-    },
-    body: JSON.stringify({
-      title: todoTitle.value,
-      tasks: [{ text: taskText.value, done: false }]
-    })
-  });
-  load();
-}
-async function load() {
-  const notes = await fetch(API + "/notes", { headers: { "x-api-key": KEY } }).then(r => r.json());
-  const todos = await fetch(API + "/todos", { headers: { "x-api-key": KEY } }).then(r => r.json());
-
-  document.getElementById("notes").innerHTML = notes.map(n => `
-    <div class='box'>
-      <h3>${n.title}</h3>
-      <p>${n.content}</p>
-    </div>
-  `).join("");
-
-  document.getElementById("todos").innerHTML = todos.map(t => `
-    <div class='box'>
-      <h3>${t.title}</h3>
-      ${t.tasks.map(task => `<p>${task.text} - ${task.done}</p>`).join("")}
-    </div>
-  `).join("");
-}
-
-load();
-</script>
+<script src="script.js"></script>
 </body>
 </html>

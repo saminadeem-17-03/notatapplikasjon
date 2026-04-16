@@ -1,110 +1,96 @@
-const express = require("express");
-const cors = require("cors");
-const fs = require("fs-extra");
-const { v4: uuid } = require("uuid");
+const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs');
 
 const app = express();
-app.use(cors());
+const PORT = 3000;
+
 app.use(express.json());
+app.use(express.static(__dirname));
 
-const DB_FILE = "db.json";
-const API_KEY = "12345"; // enkel API key
+const db = new sqlite3.Database('./database.db');
 
-// init db
-fs.ensureFileSync(DB_FILE);
-if (fs.readFileSync(DB_FILE).length === 0) {
-  fs.writeJsonSync(DB_FILE, { notes: [], todos: [] });
+// 📄 Notater tabell
+db.run(`
+CREATE TABLE IF NOT EXISTS notes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT,
+  content TEXT
+)
+`);
+
+// ✅ Todo tabell
+db.run(`
+CREATE TABLE IF NOT EXISTS todos (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  text TEXT,
+  done INTEGER
+)
+`);
+
+// 🔄 Backup
+function backup() {
+  db.serialize(() => {
+    db.all("SELECT * FROM notes", [], (e, notes) => {
+      db.all("SELECT * FROM todos", [], (e2, todos) => {
+        fs.writeFileSync('backup.json', JSON.stringify({ notes, todos }, null, 2));
+      });
+    });
+  });
 }
 
-function readDB() {
-  return fs.readJsonSync(DB_FILE);
-}
+// -------- NOTATER --------
 
-function writeDB(data) {
-    fs.writeJsonSync(DB_FILE, data, { spaces: 2 });
-  }
-  
-  // middleware for API key
-  function auth(req, res, next) {
-    if (req.headers["x-api-key"] !== API_KEY) {
-      return res.status(403).json({ error: "Ugyldig API key" });
-    }
-    next();
-  }
-  
-  // ---------- NOTES ----------
-  app.get("/notes", auth, (req, res) => {
-    const db = readDB();
-    res.json(db.notes);
+// hent
+app.get('/notes', (req, res) => {
+  db.all("SELECT * FROM notes", [], (err, rows) => {
+    res.json(rows);
   });
-  
-  app.post("/notes", auth, (req, res) => {
-    const { title, content } = req.body;
-    const db = readDB();
-  
-    const note = { id: uuid(), title, content };
-    db.notes.push(note);
-    writeDB(db);
-  
-    res.json(note);
-  });
+});
 
-  app.patch("/notes/:id", auth, (req, res) => {
-    const db = readDB();
-    const note = db.notes.find(n => n.id === req.params.id);
-  
-    if (!note) return res.status(404).send("Notat ikke funnet");
-  
-    Object.assign(note, req.body);
-    writeDB(db);
-    res.json(note);
-  });
-  
-  app.delete("/notes/:id", auth, (req, res) => {
-    const db = readDB();
-    db.notes = db.notes.filter(n => n.id !== req.params.id);
-    writeDB(db);
-    res.send("Slettet");
-  });
-  
-  // ---------- TODOS ----------
-  app.get("/todos", auth, (req, res) => {
-    const db = readDB();
-    res.json(db.todos);
-  });
+// legg til
+app.post('/notes', (req, res) => {
+  const { title, content } = req.body;
 
-  app.post("/todos", auth, (req, res) => {
-    const { title, tasks } = req.body;
-    const db = readDB();
-  
-    const todo = {
-      id: uuid(),
-      title,
-      tasks: tasks || []
-    };
-  
-    db.todos.push(todo);
-    writeDB(db);
-  
-    res.json(todo);
+  db.run("INSERT INTO notes (title, content) VALUES (?, ?)", [title, content], () => {
+    backup();
+    res.sendStatus(200);
   });
-  
-  app.patch("/todos/:id", auth, (req, res) => {
-    const db = readDB();
-    const todo = db.todos.find(t => t.id === req.params.id);
-  
-    if (!todo) return res.status(404).send("Todo ikke funnet");
-  
-    Object.assign(todo, req.body);
-    writeDB(db);
-    res.json(todo);
+});
+
+// -------- TODOS --------
+
+// hent
+app.get('/todos', (req, res) => {
+  db.all("SELECT * FROM todos", [], (err, rows) => {
+    res.json(rows);
   });
-  app.delete("/todos/:id", auth, (req, res) => {
-    const db = readDB();
-    db.todos = db.todos.filter(t => t.id !== req.params.id);
-    writeDB(db);
-    res.send("Slettet");
+});
+
+// legg til
+app.post('/todos', (req, res) => {
+  const { text } = req.body;
+
+  db.run("INSERT INTO todos (text, done) VALUES (?, 0)", [text], () => {
+    backup();
+    res.sendStatus(200);
   });
-  
-  app.listen(3000, () => console.log("Server kjører på http://localhost:3000"));
-    
+});
+
+// toggle (ikke slett!)
+app.put('/todos/:id', (req, res) => {
+  const id = req.params.id;
+
+  db.get("SELECT done FROM todos WHERE id=?", [id], (err, row) => {
+    const newVal = row.done ? 0 : 1;
+
+    db.run("UPDATE todos SET done=? WHERE id=?", [newVal, id], () => {
+      backup();
+      res.sendStatus(200);
+    });
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server kjører på http://localhost:${PORT}`);
+});
