@@ -1,7 +1,6 @@
 const express = require('express'); // Importerer Express (lager server)
 const sqlite3 = require('sqlite3').verbose(); // Importerer SQLite database
 const fs = require('fs'); // Importerer filsystem (til backup)
-
 const app = express(); // Lager en Express-app
 const PORT = 3000; // Setter port til 3000
 
