@@ -1,28 +1,28 @@
 async function loadNotes() {
-  const res = await fetch('/notes');
-  const notes = await res.json();
+  const res = await fetch('/notes'); // Henter notater fra backend
+  const notes = await res.json(); // Gjør om til JavaScript-objekt
 
-  const container = document.getElementById('notes');
-  container.innerHTML = '';
+  const container = document.getElementById('notes'); // Finner HTML-element
+  container.innerHTML = ''; // Tømmer gammel visning
 
-  notes.forEach(n => {
-    const div = document.createElement('div');
-    div.innerHTML = `<h3>${n.title}</h3><p>${n.content}</p>`;
-    container.appendChild(div);
+  notes.forEach(n => { // Går gjennom alle notater
+    const div = document.createElement('div'); // Lager nytt element
+    div.innerHTML = `<h3>${n.title}</h3><p>${n.content}</p>`; // Setter inn data
+    container.appendChild(div); // Legger til på siden
   });
 }
 
 async function addNote() {
-  const title = document.getElementById('title').value;
-  const content = document.getElementById('content').value;
+  const title = document.getElementById('title').value; // Henter tittel fra input
+  const content = document.getElementById('content').value; // Henter innhold
 
   await fetch('/notes', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, content })
+    method: 'POST', // Sender data til server
+    headers: { 'Content-Type': 'application/json' }, // Forteller at det er JSON
+    body: JSON.stringify({ title, content }) // Gjør om til JSON
   });
 
-  loadNotes();
+  loadNotes(); // Oppdaterer visning etter lagring
 }
 
-loadNotes();
+loadNotes(); // Kjører når siden lastes
