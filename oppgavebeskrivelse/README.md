@@ -1,55 +1,63 @@
-# notatapplikasjonset-up
+Notatapplikasjon med API
+Beskrivelse
 
-Start med å koble til serveren via SSH:
+Dette er en enkel notatapplikasjon hvor brukeren kan:
+
+Lage tekstnotater (tittel + innhold)
+Lage todo-lister med oppgaver
+
+Løsningen består av:
+
+Frontend (HTML + JS) som viser data til bruker
+Backend (Node.js + Express) som håndterer API
+Database (db.json) som lagrer data
+
+Hvordan det fungerer
+Frontend sender request via fetch
+Backend mottar GET, POST, DELETE, PATCH
+Data lagres i db.json
+Frontend oppdaterer visning
+
+Oppsett på server (SSH)
+
+Koble til server:
 
 ssh server@192.168.20.84
 
-Deretter fjerner du eventuell gammel versjon av prosjektet:
+Slett gammel versjon:
 
 rm -rf notatapplikasjon
 
-Klon prosjektet fra GitHub:
+Klon prosjekt:
 
 git clone https://github.com/saminadeem-17-03/notatapplikasjon.git
 
-Gå inn i server-mappen:
+Gå inn i mappen:
 
 cd notatapplikasjon
 
-Installer nødvendige avhengigheter:
+Installer:
 
 npm install
 
-Fiks eventuelle sikkerhetsproblemer:
+Fiks feil:
 
 npm audit fix
 
-Rebuild prosjektet (hvis nødvendig):
+Rebuild (valgfritt):
 
 npm rebuild
 
-Start serveren og lagre logg:
+Start server:
 
-node server.js > log.txt
+node server.js 
 
-Applikasjonen er nå tilgjengelig i nettleser:
+Åpne i nettleser:
 
 http://192.168.20.84:3000
 
-
-
-Bruk av Git (GitHub Terminal)
-
-For å lagre og laste opp endringer:
-
-Legg til endringer:
+Lagre endringer:
 
 git add .
-
-Commit med melding:
-
-git commit -a -m "comment"
-
-Push til GitHub:
-
+git commit -a -m "endringer"
 git push
