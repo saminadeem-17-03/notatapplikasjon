@@ -6,7 +6,7 @@ Dette er en enkel notatapplikasjon hvor brukeren kan:
 Lage tekstnotater (tittel + innhold)
 Lage todo-lister med oppgaver
 
-Løsningen består av:
+Løsningen min består av:
 
 Frontend (HTML + JS) som viser data til bruker
 Backend (Node.js + Express) som håndterer API
@@ -17,6 +17,28 @@ Frontend sender request via fetch
 Backend mottar GET, POST, DELETE, PATCH
 Data lagres i db.json
 Frontend oppdaterer visning
+
+
+
+Refleksjon:
+
+Jeg valgte å bruke:
+
+Express fordi det er enkelt å lage API
+JSON-fil som database fordi det er lett å forstå og bruke
+Fetch API i frontend for kommunikasjon
+
+Fordeler:
+
+Enkelt å implementere
+Lett å forstå hvordan data flyter
+
+Ulemper:
+
+JSON-fil er ikke skalerbar
+Ingen sikkerhet (ingen autentisering)
+
+
 
 Oppsett på server (SSH)
 
